@@ -1,0 +1,7 @@
+db/
+incremental_db/
+simulation/
+greybox_tmp/
+*.rpt
+*.summary
+*.done
