@@ -2,6 +2,14 @@ db/
 incremental_db/
 simulation/
 greybox_tmp/
+hc_output/
+output_files/
+
 *.rpt
 *.summary
 *.done
+*.pin
+*.jdi
+*.sld
+*.smsg
+*.bak
