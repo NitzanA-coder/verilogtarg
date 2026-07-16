@@ -31,6 +31,7 @@ module Rx(
 			case(state)
 				// Wait for start bit (rx = 0)
 				IDLE: begin
+					data_out <= 8'b0;
 					parity_error <= 1'b0;
 					if(!rx) begin
 						state <= DATA_WRITE;

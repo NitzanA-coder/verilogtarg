@@ -78,6 +78,14 @@ rst = 1'b1;
 #200
 start_bit = 1'b0;
 #20
+start_bit = 1'b1;
+#3000
+start_bit = 1'b0;
+#110
+start_bit = 1'b1;
+#3000
+start_bit = 1'b0;
+#110
 start_bit = 1'b1;                                                       
 // --> end                                             
 $display("Running testbench");                       
