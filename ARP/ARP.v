@@ -2,7 +2,7 @@ module ARP(
 	input wire clk,
 	input wire rst, // Active-low reset
 	input wire [1:0] data, // 2-bit serialized input stream
-	output reg CRS_DV = 1'b0, // Indicates active frame reception
+	input wire CRS_DV, // Indicates active frame reception
 	output reg packet_ready = 1'b0 // Asserted when full ARP packet has been assembled
 );
 
@@ -46,7 +46,6 @@ module ARP(
 			state <= IDLE;
 			packet_ready <= 1'b0;
 			cnt_clk <= 5'd0;
-			CRS_DV <= 1'b0;
 			preamble_cnt <= 5'd0;
 			destination_MAC <= 48'd0;
 			source_MAC <= 48'd0;
@@ -67,7 +66,6 @@ module ARP(
 				IDLE: begin
 					packet_ready <= 1'b0;
 					preamble_cnt <= 5'd0;
-					CRS_DV <= 1'b0;
 					cnt_clk <= 5'd0;
 					destination_MAC <= 48'd0;
 					source_MAC <= 48'd0;
@@ -82,14 +80,13 @@ module ARP(
 					target_MAC <= 48'd0;
 					target_IP <= 32'd0;
 					
-					if(data == 2'b10) begin // Detect custom preamble start symbol
+					if(CRS_DV) begin // Detect custom preamble start symbol
 						state <= PREAMBLE;
 					end
 				end
 				
 				// Count preamble symbols until SFD is detected.
 				PREAMBLE: begin
-					CRS_DV <= 1'b1;
 					if(data != 2'b10) begin // If symbol is not part of preamble, check for SFD
 						if(preamble_cnt == 5'd30 && data == 2'b11) begin
 							preamble_cnt <= 5'd0;
