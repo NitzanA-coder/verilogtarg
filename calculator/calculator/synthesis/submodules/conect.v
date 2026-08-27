@@ -54,15 +54,17 @@ module conect(
 				end
 				
 				WAIT_FOR_N1: begin
-					if (write && chipselect)
+					if (write && chipselect) begin
 						state <= WAIT_FOR_N2;
 						NUM1 <= writedata;
+					end
 				end
 				
 				WAIT_FOR_N2: begin
-					if (write && chipselect)
+					if (write && chipselect) begin
 						state <= WAIT_FOR_READ;
 						NUM2 <= writedata;
+					end
 				end
 				
 				WAIT_FOR_READ: begin
