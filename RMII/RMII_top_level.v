@@ -1,6 +1,6 @@
 module RMII_top_level (
 	input wire ref_clk,
-	input wire reset,
+	input wire reset_n,
 	input wire send1,
 	input wire send2,
 	output wire tx_en1,
@@ -20,7 +20,7 @@ module RMII_top_level (
 	
 	RMII_module RMII_module1 (
 		.ref_clk (ref_clk),
-		.reset (reset),
+		.reset_n (reset_n),
 		.send (send1),
 		.data_in (data_in1),
 		.tx_data (tx_data1),
@@ -33,7 +33,7 @@ module RMII_top_level (
 	
 	RMII_module RMII_module2 (
 		.ref_clk (ref_clk),
-		.reset (reset),
+		.reset_n (reset_n),
 		.send (send2),
 		.data_in (data_in2),
 		.tx_data (tx_data2),

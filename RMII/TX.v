@@ -1,6 +1,6 @@
 module TX (
 	input wire ref_clk,
-	input wire reset,
+	input wire reset_n,
 	input wire send,
 	input wire [1:0] data_in,
 	
@@ -8,8 +8,8 @@ module TX (
 	output reg tx_en = 1'b0
 	);
 	
-	always @(posedge ref_clk or negedge reset) begin
-		if (reset == 1'b0) begin
+	always @(posedge ref_clk or negedge reset_n) begin
+		if (reset_n == 1'b0) begin
 			tx_data <= 2'b00;
 			tx_en <= 1'b0;
 		end

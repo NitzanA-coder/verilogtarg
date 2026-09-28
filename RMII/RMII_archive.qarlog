@@ -1,0 +1,20 @@
+Quartus Prime Archive log --	C:/projects/verilogTarg/RMII/RMII_archive.qarlog
+
+Archive:	C:/projects/verilogTarg/RMII/RMII_archive.qar
+Date:		Sat Sep 19 16:19:17 2026
+Quartus Prime		17.0.0 Build 595 04/25/2017 SJ Lite Edition
+
+	=========== Files Selected: ===========
+C:/projects/verilogTarg/RMII/RMII.qpf
+C:/projects/verilogTarg/RMII/RMII.qsf
+C:/projects/verilogTarg/RMII/RMII_module.v
+C:/projects/verilogTarg/RMII/RMII_top_level.v
+C:/projects/verilogTarg/RMII/RMII_top_level_tb.v
+C:/projects/verilogTarg/RMII/RX.v
+C:/projects/verilogTarg/RMII/TX.v
+C:/projects/verilogTarg/RMII/simulation/modelsim/RMII_top_level.vt
+c:/intelfpga_lite/17.0/quartus/bin64/assignment_defaults.qdf
+	======= Total: 9 files to archive =======
+
+	================ Status: ===============
+All files archived successfully.

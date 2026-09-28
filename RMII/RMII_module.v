@@ -1,6 +1,6 @@
 module RMII_module(
 	input wire ref_clk,
-	input wire reset,
+	input wire reset_n,
 	input wire crs_dv,
 	input wire send,
 	input wire tx_en,
@@ -14,7 +14,7 @@ module RMII_module(
 
 	TX TX(
 		.ref_clk (ref_clk),
-		.reset (reset),
+		.reset_n (reset_n),
 		.send (send),
 		.data_in (data_in),
 		.tx_data (tx_data),
@@ -23,7 +23,7 @@ module RMII_module(
 	
 	RX RX(
 		.ref_clk (ref_clk),
-		.reset (reset),
+		.reset_n (reset_n),
 		.crs_dv (crs_dv),
 		.rx_data (rx_data),
 		.data_valid (data_valid),

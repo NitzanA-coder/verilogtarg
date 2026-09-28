@@ -6,7 +6,7 @@ reg crs_dv2;
 reg [1:0] data_in1;
 reg [1:0] data_in2;
 reg ref_clk;
-reg reset;
+reg reset_n;
 reg send1;
 reg send2;
 // wires
@@ -17,9 +17,62 @@ wire data_valid2;
 wire tx_en1;
 wire tx_en2;
 
-reg [543:0] data1 = 544'h55555555555555d5ffffffffffff98ded0c357d70806000108000604000198ded0c357d70a09001affffffffffff0a09001a000000000000000000000000000000000001;
-reg [543:0] data2 = 544'h55555555555555d5ffffffffffff106838ccd4b608060001080006040001106838ccd4b60a09083f0000000000000a09083f000000000000000000000000000000000001;
+localparam [55:0] PREAMBLE = 56'h55555555555555;
+localparam [7:0]  SFD = 8'hD5;
+localparam [47:0] BROADCAST_MAC = 48'hFFFFFFFFFFFF;
+localparam [15:0] ETHERTYPE = 16'h0806;
+localparam [15:0] H_TYPE = 16'h0001;
+localparam [15:0] P_TYPE = 16'h0800;
+localparam [7:0]  H_LEN = 8'h06;
+localparam [7:0]  P_LEN = 8'h04;
+localparam [15:0] OPER = 16'h0001;
+localparam [143:0] PADDING = 144'h0;
 
+localparam [47:0] S_MAC1 = 48'h98DED0C357D7;
+localparam [31:0] S_IP1  = 32'h0A09001A;
+localparam [47:0] T_MAC1 = 48'hFFFFFFFFFFFF;
+localparam [31:0] T_IP1  = 32'h0A09001A;
+
+localparam [47:0] S_MAC2    = 48'h106838CCD4B6;
+localparam [31:0] S_IP2  = 32'h0A09083F;
+localparam [47:0] T_MAC2 = 48'h000000000000;
+localparam [31:0] T_IP2  = 32'h0A09083F;
+
+reg [543:0] data1 = {
+    PREAMBLE,
+	 SFD,
+    BROADCAST_MAC,
+    S_MAC1,
+    ETHERTYPE,
+    H_TYPE,
+	 P_TYPE,
+	 H_LEN,
+	 P_LEN,
+	 OPER,
+    S_MAC1,
+    S_IP1,
+    T_MAC1,
+    T_IP1,
+    PADDING
+};
+
+reg [543:0] data2 = {
+    PREAMBLE,
+	 SFD,
+    BROADCAST_MAC,
+    S_MAC2,
+    ETHERTYPE,
+    H_TYPE,
+	 P_TYPE,
+	 H_LEN,
+	 P_LEN,
+	 OPER,
+    S_MAC2,
+    S_IP2,
+    T_MAC2,
+    T_IP2,
+    PADDING
+};
 // assign statements (if any)
 RMII_top_level i1 (
 // port map - connection between master ports and signals/registers
@@ -32,7 +85,7 @@ RMII_top_level i1 (
 	.data_valid1(data_valid1),
 	.data_valid2(data_valid2),
 	.ref_clk(ref_clk),
-	.reset(reset),
+	.reset_n(reset_n),
 	.send1(send1),
 	.send2(send2),
 	.tx_en1(tx_en1),
@@ -41,33 +94,32 @@ RMII_top_level i1 (
 
 task automatic sending;
   input [543:0] data;
-  input integer target;
+  input target;
   integer i;
   begin
-		for (i = 0; i < 272; i = i + 1) begin
-			if (target == 1) begin
-				data_in1 <= data[543:542];
+		for (i = 0; i < $bits(data)/2; i = i + 1) begin
+			if (target) begin
+				data_in1 <= data[$bits(data)-1 - i*2 -: 2];
 				crs_dv1  <= 1'b1;
 				send1    <= 1'b1;
 			end
 			else begin
-				data_in2 <= data[543:542];
+				data_in2 <= data[$bits(data)-1 - i*2 -: 2];
 				crs_dv2  <= 1'b1;
 				send2    <= 1'b1;
 			end
-			data = {data[541:0], 2'b00};
 			 
-			if (i >= 270) begin
-            if (target == 1)
+			if (i >= $bits(data)/2 - 2) begin
+            if (target)
 					crs_dv1 <= ~crs_dv1;				
 				else 
 					crs_dv2 <= ~crs_dv2;
          end
 			 
-			 @(posedge ref_clk);
+			@(posedge ref_clk);
 		end
 
-		if (target == 1) begin
+		if (target) begin
 			crs_dv1 <= 1'b0;
 			data_in1 <= 2'b00;
 			@(posedge ref_clk);
@@ -86,7 +138,7 @@ initial
 begin
 // code that executes only once
 ref_clk = 1'b0;
-reset = 1'b0;
+reset_n = 1'b0;
 crs_dv1 = 1'b0;
 crs_dv2 = 1'b0;
 data_in1 = 2'b00;
@@ -94,17 +146,14 @@ data_in2 = 2'b00;
 send1 = 1'b0;
 send2 = 1'b0;
 #30
-reset = 1'b1;
+reset_n = 1'b1;
 #20
 
 $display("Running testbench");
 
-crs_dv1 = 1'b1;
-#40
-
 fork
-	sending(data1, 1);
-	sending(data2, 2);
+	sending(data1, 1'b1);
+	sending(data2, 1'b0);
 join
 
 #100
@@ -112,15 +161,8 @@ join
 $display("Testbench finished");
 $stop;
 end
-always
-// optional sensitivity list
-// @(event1 or event2 or .... eventn)
-begin
-// code executes for every event on sensitivity list
-// insert code here --> begin
-#10
-ref_clk = ~ref_clk;
-// --> end
-end
+
+always #10 ref_clk = ~ref_clk;
+
 endmodule
 
